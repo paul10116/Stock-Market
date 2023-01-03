@@ -7,13 +7,13 @@ def pair(longs, shorts):
 
     longArray = longs.split()
     shortArray = shorts.split()
+
     for buy_ticker in longArray:
 
         ticker1 = yf.Ticker(buy_ticker)
         for sell_ticker in shortArray:
 
             ticker2 = yf.Ticker(sell_ticker)
-
             if buy_ticker != sell_ticker:
                 dataframe1 = ticker1.history(
                     start="2013-01-01", interval="1d", actions=False, rounding=True)

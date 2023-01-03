@@ -6,19 +6,27 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog
 
+btn_color = "#2d661b"
+input_clr = "#d3d5d7"
+high_clr = "#27a300"
+active_btn = "#5c0000"
+
 
 root = Tk()
 root.title("Pair Finder")
-root.geometry("1800x800")
+x = int(root.winfo_screenwidth()*0.03)
+y = int(root.winfo_screenheight()*0.1)
+root.geometry("1800x800+" + str(x) + "+" + str(y))
 root.iconbitmap('images\programIcon.ico')
 root.configure(background="BLACK", padx=20, pady=20)
+# root.eval("tk::PlaceWindow . center")
 
 # program menu line
 
 program_menu = Menu(root)
 root.config(menu=program_menu)
-subMenu1 = Menu(program_menu, tearoff=0, font=("Helvetica", 14))
-subMenu2 = Menu(program_menu, tearoff=0, font=("Helvetica", 14))
+subMenu1 = Menu(program_menu, tearoff=0, font=("Helvetica", 12))
+subMenu2 = Menu(program_menu, tearoff=0, font=("Helvetica", 12))
 
 program_menu.add_cascade(label="File", menu=subMenu1)
 subMenu1.add_command(label="Exit Program", command=root.quit)
@@ -30,28 +38,43 @@ def getTickers():
     longs = longTickers.get()
     shorts = shortTickers.get()
     pair(longs, shorts)
+    submitBtn.flash()
 
 
-pairFinderFrame = LabelFrame(
-    root, text="Pair Finder", padx=20, pady=20, font=("Helvetica", 20), background="GREY")
-longTickers = Entry(pairFinderFrame, width=100,
-                    borderwidth=3, font=("Helvetica", 14))
+pairFinderFrame = LabelFrame(root, text="Pair Finder", padx=20,
+                             pady=20, fg="WHITE", font=("Helvetica", 20, "bold"), labelanchor="n", borderwidth=6, background="BLACK", relief="ridge")
+longTickers = Entry(pairFinderFrame,
+                    width=100,
+                    bg=input_clr,
+                    font=("Helvetica", 16),
+                    highlightcolor=high_clr,
+                    highlightthickness=3)
 longLabel = Label(pairFinderFrame, text="Enter Long Tickers:",
-                  font=("Helvetica", 14), background="GREY", fg="WHITE")
+                  font=("Helvetica", 14), background="BLACK", fg="WHITE")
 
-shortTickers = Entry(pairFinderFrame, width=100,
-                     borderwidth=3, font=("Helvetica", 14))
+shortTickers = Entry(pairFinderFrame,
+                     width=100,
+                     bg=input_clr,
+                     font=("Helvetica", 16),
+                     highlightcolor=high_clr,
+                     highlightthickness=3)
 shortLabel = Label(
-    pairFinderFrame, text="Enter Short Tickers:", font=("Helvetica", 14), background="GREY", fg="WHITE")
+    pairFinderFrame, text="Enter Short Tickers:", font=("Helvetica", 14), background="BLACK", fg="WHITE")
 
-submitBtn = Button(pairFinderFrame, text="Compare",
-                   command=getTickers, font=("Helvetica", 16), background="GREEN")
+submitBtn = Button(pairFinderFrame,
+                   text="Compare",
+                   command=getTickers,
+                   font=("Helvetica", 16, "bold"),
+                   background=btn_color,
+                   cursor="exchange",
+                   activebackground=active_btn,
+                   activeforeground=btn_color)
 
-longLabel.grid(row=0, column=0, padx=5, pady=5)
+longLabel.grid(row=0, column=0, padx=5, pady=5, sticky="W")
 longTickers.grid(row=1, column=0, padx=10, pady=10)
-shortLabel.grid(row=2, column=0, padx=5, pady=5)
+shortLabel.grid(row=2, column=0, padx=5, pady=5, sticky="W")
 shortTickers.grid(row=3, column=0, padx=10, pady=10)
-submitBtn.grid(row=4, column=0, padx=10, pady=10)
+submitBtn.grid(row=4, column=0, padx=10, pady=10, sticky="E")
 
 
 # Correlation Frame
@@ -59,18 +82,32 @@ submitBtn.grid(row=4, column=0, padx=10, pady=10)
 def corrButton():
     corr_data = corrInput.get()
     correlation(corr_data)
+    corrBtn.flash()
 
 
 corrFrame = LabelFrame(root, text="Correlation", padx=20,
-                       pady=20, font=("Helvetica", 20), background="GREY")
+                       pady=20, fg="WHITE", font=("Helvetica", 20, "bold"), labelanchor="n", borderwidth=6, background="BLACK", relief="ridge")
 corrLabel = Label(corrFrame, text="Enter Tikcers", font=(
-    "Helvetica", 16), background="GREY", fg="WHITE")
-corrInput = Entry(corrFrame, width=150, borderwidth=3, font=("Helvetica", 14))
-corrBtn = Button(corrFrame, text="Check Correlation",
-                 command=corrButton, font=("Helvetica", 18), background="GREEN")
-corrLabel.grid(row=0, column=0, padx=5, pady=5)
+    "Helvetica", 16), background="BLACK", fg="WHITE")
+corrInput = Entry(corrFrame,
+                  bg=input_clr,
+                  state="normal",
+                  width=100,
+                  bd=3,
+                  font=("Helvetica", 16),
+                  highlightcolor=high_clr,
+                  highlightthickness=3)
+corrBtn = Button(corrFrame,
+                 text="Check Correlation",
+                 command=corrButton,
+                 font=("Helvetica", 16, "bold"),
+                 background=btn_color,
+                 cursor="exchange",
+                 activebackground=active_btn,
+                 activeforeground=btn_color)
+corrLabel.grid(row=0, column=0, padx=5, pady=5, sticky="W")
 corrInput.grid(row=1, column=0, padx=10, pady=10)
-corrBtn.grid(row=2, column=0, padx=10, pady=10)
+corrBtn.grid(row=2, column=0, padx=10, pady=10, sticky="E")
 
 
 # Watchlist window
