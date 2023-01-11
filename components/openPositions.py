@@ -15,11 +15,11 @@ def open_position(buy_ticker, sell_ticker, value, longPrice, shortPrice):
     ticker1 = yf.Ticker(buy_ticker)
     ticker2 = yf.Ticker(sell_ticker)
     dataFrame1 = ticker1.history(
-        start='2018-1-1', actions=True, rounding=True)
+        start='2018-1-1', actions=False, rounding=True)
     dataFrame2 = ticker2.history(
-        start='2018-1-1', actions=True, rounding=True)
+        start='2018-1-1', actions=False, rounding=True)
     spy = beta_ticker.history(
-        start='2020-1-1', actions=True, rounding=True)
+        start='2020-1-1', actions=False, rounding=True)
 
     ratio = dataFrame1.Close / dataFrame2.Close
     spread = dataFrame1.Close - dataFrame2.Close
@@ -44,9 +44,9 @@ def open_position(buy_ticker, sell_ticker, value, longPrice, shortPrice):
 
     # ATR calculator:
 
-    risk1 = ticker1.history(period="ytd", interval="1mo",
+    risk1 = ticker1.history(start='2018-1-1', interval="1mo",
                             actions=False, rounding=True)
-    risk2 = ticker2.history(period="ytd", interval="1mo",
+    risk2 = ticker2.history(start='2018-1-1', interval="1mo",
                             actions=False, rounding=True)
 
     risk1.dropna(axis=0, inplace=True)
