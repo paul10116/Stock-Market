@@ -4,6 +4,7 @@ import pandas as pd
 from plotly import tools
 import plotly.graph_objs as go
 from tickers import *
+from indicators import beta
 
 start_date = date.fromisoformat("2015-01-03")
 
@@ -22,25 +23,28 @@ def pair(longs, shorts):
 
             if buy_ticker != sell_ticker:
                 dataframe1 = ticker1.history(
-                    start=start_date, interval="1d", rounding=True, auto_adjust=True).Close
+                    start=start_date, interval="1d", rounding=True, actions=False, auto_adjust=True).Close
                 dataframe2 = ticker2.history(
-                    start=start_date, interval="1d", rounding=True, auto_adjust=True).Close
+                    start=start_date, interval="1d", rounding=True, actions=False, auto_adjust=True).Close
 
                 corr_matrix = pd.concat(
                     [dataframe1, dataframe2], axis=1).corr().round(2)
                 corr_check = corr_matrix.iloc[0, 1]
-                print(f"{buy_ticker}/{sell_ticker} corr={corr_check}")
 
-                if corr_check > 0.4 or corr_check < -0.4:
-                    data = pd.DataFrame({
-                        'ratio': (dataframe1/dataframe2).round(3),
-                        'spread': (dataframe1-dataframe2).round(2)
-                    })
+                print(f"{buy_ticker} / {sell_ticker} CORR = {corr_check}")
+                if corr_check > 0.3 or corr_check < -0.3:
 
-                    if data.ratio[-1] > 0.4 and data.ratio[-1] < 2:
-                        data['ratioMA200'] = data['ratio'].rolling(
-                            200).mean().round(3)
+                    long_beta = beta(dataframe1, buy_ticker).round(2)
+                    short_beta = beta(dataframe2, sell_ticker).round(2)
+
+                    if long_beta <= short_beta:
+                        data = pd.DataFrame({
+                            'ratio': (dataframe1/dataframe2).round(3),
+                            'spread': (dataframe1-dataframe2).round(2)
+                        })
                         data['spreadMA200'] = data['spread'].rolling(
+                            200).mean().round(2)
+                        data['ratioMA200'] = data['ratio'].rolling(
                             200).mean().round(2)
 
                         if data.ratio[-1] > data.ratioMA200[-1] and data.spread[-1] > data.spreadMA200[-1]:
@@ -50,7 +54,7 @@ def pair(longs, shorts):
                             data["spreadMA20"] = data.spread.rolling(
                                 20).mean().round(2)
 
-                            if data.spreadMA60[-1] > data.spread[-1] and data.spreadMA20[-1] < data.spread[-1]:
+                            if data.spreadMA20[-1] > data.spreadMA60[-1] and data.spreadMA60[-30] > data.spreadMA60[-1]:
 
                                 sub_trace1 = go.Scatter(
                                     y=dataframe1, mode='lines', name=buy_ticker)
@@ -58,8 +62,6 @@ def pair(longs, shorts):
                                     y=dataframe2, mode='lines', name=sell_ticker)
                                 sub_trace3 = go.Scatter(
                                     y=data.ratio, mode='lines', name='Ratio')
-                                sub_trace4 = go.Scatter(
-                                    y=data.ratioMA200, mode='lines', name='Ratio MA 200')
                                 sub_trace5 = go.Scatter(
                                     y=data.spread, mode='lines', name='Spread')
                                 sub_trace6 = go.Scatter(
@@ -74,7 +76,6 @@ def pair(longs, shorts):
                                 sub_fig.append_trace(sub_trace1, 1, 1)
                                 sub_fig.append_trace(sub_trace2, 2, 1)
                                 sub_fig.append_trace(sub_trace3, 1, 2)
-                                sub_fig.append_trace(sub_trace4, 1, 2)
                                 sub_fig.append_trace(sub_trace5, 2, 2)
                                 sub_fig.append_trace(sub_trace6, 2, 2)
                                 sub_fig.append_trace(sub_trace7, 2, 2)
@@ -83,4 +84,4 @@ def pair(longs, shorts):
                                 sub_fig.show()
 
 
-pair(tickers_2_20, tickers_2_20)
+pair(all_tickers, all_tickers)

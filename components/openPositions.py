@@ -104,7 +104,7 @@ def open_position(buy_ticker, sell_ticker, value, longPrice, shortPrice):
     print(f"Entry:", np.round(Entry, 2), f"Ratio:", np.round(
         ratio[-1], 2), f"Exit point:", np.round(stop_loss, 2), f"Target:", np.round(Target, 2))
 
-    fig, axes = plt.subplots(3, figsize=(18, 20))
+    fig, axes = plt.subplots(3, figsize=(15, 15))
 
     axes[0].set_title(f"{buy_ticker} / {sell_ticker}")
     sns.lineplot(data=dataFrame1, x="Date", y="Close",

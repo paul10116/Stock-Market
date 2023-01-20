@@ -20,7 +20,7 @@ def pair(buy_ticker, sell_ticker):
     spread = dataFrame1.Close - dataFrame2.Close
 
     # CHART
-    chart = fig, axes = plt.subplots(3, figsize=(18, 12))
+    chart = fig, axes = plt.subplots(3, figsize=(15, 15))
     axes[0].set_title(
         f"{buy_ticker} // {sell_ticker}")
     sns.lineplot(data=dataFrame1, x="Date", y="Close",
