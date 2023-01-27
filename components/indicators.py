@@ -17,3 +17,12 @@ def beta(data, ticker):
     long_beta = ticker1_cov/ticker1_var
 
     return long_beta
+
+
+def vol_channel(data):
+    channel = pd.DataFrame({
+        "UpperBand": (data.rolling(50).mean()) +
+        (data.rolling(50).std()),
+        "LowerBand": (data.rolling(50).mean()) -
+        (data.rolling(50).std())
+    })

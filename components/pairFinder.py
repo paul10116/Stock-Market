@@ -34,14 +34,12 @@ def pair(longs, shorts):
                 print(f"{buy_ticker} / {sell_ticker} CORR = {corr_check}")
                 if corr_check > 0.3 or corr_check < -0.3:
 
-                    long_beta = beta(dataframe1, buy_ticker).round(2)
-                    short_beta = beta(dataframe2, sell_ticker).round(2)
+                    data = pd.DataFrame({
+                        'ratio': (dataframe1/dataframe2).round(3),
+                        'spread': (dataframe1-dataframe2).round(2)
+                    })
 
-                    if long_beta <= short_beta:
-                        data = pd.DataFrame({
-                            'ratio': (dataframe1/dataframe2).round(3),
-                            'spread': (dataframe1-dataframe2).round(2)
-                        })
+                    if data.ratio[-1] > 0.4:
                         data['spreadMA200'] = data['spread'].rolling(
                             200).mean().round(2)
                         data['ratioMA200'] = data['ratio'].rolling(
@@ -54,7 +52,7 @@ def pair(longs, shorts):
                             data["spreadMA20"] = data.spread.rolling(
                                 20).mean().round(2)
 
-                            if data.spreadMA20[-1] > data.spreadMA60[-1] and data.spreadMA60[-30] > data.spreadMA60[-1]:
+                            if data.spreadMA20[-1] < data.spreadMA60[-1]:
 
                                 sub_trace1 = go.Scatter(
                                     y=dataframe1, mode='lines', name=buy_ticker)
