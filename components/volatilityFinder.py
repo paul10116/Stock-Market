@@ -31,9 +31,6 @@ def pair(longs, shorts):
                 corr_check = pd.concat(
                     [dataframe[buy_ticker], dataframe[sell_ticker]], axis=1).corr().iloc[0, 1].round(2)
 
-                print(
-                    f"{buy_ticker} / {sell_ticker} CORR = {corr_check}")
-
                 if corr_check > 0.3 or corr_check < -0.3:
                     if beta_bearish == True:
 
@@ -46,6 +43,8 @@ def pair(longs, shorts):
                         ratio_upper = data.iloc[-1, 0] < 3
 
                         if ratio_lower == True and ratio_upper == True:
+                            print(
+                                f"{buy_ticker} / {sell_ticker} CORR = {corr_check}")
 
                             data['spreadMA200'] = data.spread.ewm(
                                 span=200, adjust=False).mean()
@@ -64,7 +63,7 @@ def pair(longs, shorts):
                                 data["ratioATR%"] = (
                                     (data.ratioATR+data.ratioATR.shift())/2)/data.ratioMax
 
-                                ratio_ATR = data.iloc[-1, 7] > 0.3
+                                ratio_ATR = data.iloc[-1, 7] > 0.5
 
                                 if ratio_ATR == True:
                                     print(data.tail(1))
@@ -100,4 +99,4 @@ def pair(longs, shorts):
                                     sub_fig.show()
 
 
-pair('ABB', 'OMF ORA ORCL ORI OSK OSW OTEX OUT OVV OXY OZK PAAS PACW PAG PAGP PB PBF PBR PCH PDCE PDCO PEG PFE PFGC PFS PG PGR PH PHG PII PINC PK PKG PKI PLD PLNT PM PNC PNFP PNM PNR PNW POR POST POWI PRA PRGO PRQR PRU PSA PSTG PSX PVH PWR PXD QDEL QSR QTWO RAD')
+pair('OMI   ONB   OPCH   ORLY   PAA   PACB   PANW   PARA   PARR   PAYX   PBA   PCAR   PCG   PDM   PEAK   PEB   PENN   PEP   PFG   PGTI   PHM   PLAB   PLUG   PMT   PODD   PPG   PPL   PR   PRDO   PRMW   PRPL   PRTS   PTC   PTCT   PTEN   PUMP   PYPL   QCOM   QGEN   QRVO   RAMP', database_tickers)
