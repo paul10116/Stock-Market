@@ -99,4 +99,4 @@ def pair(longs, shorts):
                                     sub_fig.show()
 
 
-pair('OMI   ONB   OPCH   ORLY   PAA   PACB   PANW   PARA   PARR   PAYX   PBA   PCAR   PCG   PDM   PEAK   PEB   PENN   PEP   PFG   PGTI   PHM   PLAB   PLUG   PMT   PODD   PPG   PPL   PR   PRDO   PRMW   PRPL   PRTS   PTC   PTCT   PTEN   PUMP   PYPL   QCOM   QGEN   QRVO   RAMP', database_tickers)
+pair('RCKT   RCL   RCM   RDFN   RDN   REG   REGN   RELX   RES   REXR   RF   RGEN   RGLD   RIO   RIOT   RLJ   ROIC   ROL   ROST   RPD   RPM   RS   RTO   RVNC   RYAAY   SABR', database_tickers)
