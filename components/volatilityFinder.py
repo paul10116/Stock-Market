@@ -7,8 +7,6 @@ import sqlalchemy
 from indicators import beta
 
 engine = sqlalchemy.create_engine('sqlite:///database.db')
-data = pd.read_sql_query(
-    "SELECT * FROM stockData", engine, parse_dates="Date")
 
 
 def pair(longs, shorts):
@@ -99,4 +97,4 @@ def pair(longs, shorts):
                                     sub_fig.show()
 
 
-pair('RCKT   RCL   RCM   RDFN   RDN   REG   REGN   RELX   RES   REXR   RF   RGEN   RGLD   RIO   RIOT   RLJ   ROIC   ROL   ROST   RPD   RPM   RS   RTO   RVNC   RYAAY   SABR', database_tickers)
+pair('DVN DXC EC ED EFX EGO EHC EIX EL ELF ELME ELP ELV EMR ENR ENV EOG EPAC EPAM EPR EQC EQR ERF ERII ERJ ES ESI ESNT ESS ETN ETR EVTC EWBC EXPI EXR EYE FAF FBIN FCF FDX FERG FFBC FFIV FFWM FHB', database_tickers)

@@ -1,36 +1,44 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
-import yfinance as yf
-
-sns.set_style("darkgrid")
-sns.set(font_scale=1.7)
+import pandas as pd
+import numpy as np
+from plotly import tools
+import plotly as py
+import plotly.graph_objs as go
+from components.tickers import *
+import sqlite3
+import sqlalchemy
+py.offline.init_notebook_mode(connected=True)
+engine = sqlalchemy.create_engine('sqlite:///database.db')
 
 
 def pair(buy_ticker, sell_ticker):
 
-    ticker1 = yf.Ticker(buy_ticker)
-    ticker2 = yf.Ticker(sell_ticker)
+    dataframe = pd.read_sql_query(
+        f"SELECT Date, {buy_ticker}, {sell_ticker} FROM stockData", engine, parse_dates="Date")
 
-    dataFrame1 = ticker1.history(
-        start='2018-1-1', actions=True, rounding=True)
-    dataFrame2 = ticker2.history(
-        start='2018-1-1', actions=True, rounding=True)
-
-    ratio = dataFrame1.Close / dataFrame2.Close
-    spread = dataFrame1.Close - dataFrame2.Close
+    data = pd.DataFrame({
+        'Date': dataframe["Date"],
+        'ratio': (dataframe[buy_ticker]/dataframe[sell_ticker]),
+        'spread': (dataframe[buy_ticker]-dataframe[sell_ticker]).round(2)
+    })
 
     # CHART
-    chart = fig, axes = plt.subplots(3, figsize=(15, 15))
-    axes[0].set_title(
-        f"{buy_ticker} // {sell_ticker}")
-    sns.lineplot(data=dataFrame1, x="Date", y="Close",
-                 ax=axes[0], label=buy_ticker)
-    sns.lineplot(data=dataFrame2, x="Date", y="Close",
-                 ax=axes[0], label=sell_ticker)
-    axes[1].set_title(f"Ratio {buy_ticker} / {sell_ticker}")
-    sns.lineplot(data=ratio, ax=axes[1])
-    axes[2].set_title(f"Spread {buy_ticker} / {sell_ticker}")
-    sns.lineplot(data=spread, ax=axes[2])
-    plt.tight_layout(pad=1)
 
-    return chart
+    sub_fig = tools.make_subplots(rows=2, cols=2, subplot_titles=[
+        buy_ticker, "Ratio", sell_ticker, 'Spread'], shared_xaxes=True)
+
+    sub_trace1 = go.Scatter(x=dataframe['Date'],
+                            y=dataframe[buy_ticker], mode='lines', name=buy_ticker)
+    sub_trace2 = go.Scatter(x=dataframe['Date'],
+                            y=dataframe[sell_ticker], mode='lines', name=sell_ticker)
+    sub_trace3 = go.Scatter(
+        x=dataframe['Date'], y=data['ratio'], mode='lines', name='Ratio')
+    sub_trace4 = go.Scatter(
+        x=dataframe['Date'], y=data['spread'], mode='lines', name='Spread')
+
+    sub_fig.append_trace(sub_trace1, 1, 1)
+    sub_fig.append_trace(sub_trace2, 2, 1)
+    sub_fig.append_trace(sub_trace3, 1, 2)
+    sub_fig.append_trace(sub_trace4, 2, 2)
+    sub_fig.update_layout(height=700, width=1700)
+
+    sub_fig.show()
