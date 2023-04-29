@@ -33,8 +33,8 @@ def pair(longs, shorts):
                     'spread': (dataframe[buy_ticker]-dataframe[sell_ticker]).round(2)
                 })
 
-                ratio_lower = data.iloc[-1, 1] > 0.4
-                ratio_upper = data.iloc[-1, 1] < 20
+                ratio_lower = data.iloc[-1, 1] > 0.3
+                ratio_upper = data.iloc[-1, 1] < 3
 
                 if ratio_lower == True and ratio_upper == True:
 
@@ -45,7 +45,7 @@ def pair(longs, shorts):
                     data["ratioATR%"] = (
                         (data.ratioATR+data.ratioATR.shift())/2)/data.ratioMax
 
-                    ratio_ATR = data.iloc[-1, 6] > 0.3
+                    ratio_ATR = data.iloc[-1, 6] > 0.2
 
                     if ratio_ATR == True:
                         print(f"{buy_ticker} / {sell_ticker}")
@@ -74,8 +74,8 @@ def pair(longs, shorts):
                         plt.tight_layout(pad=1)
 
                         fig.savefig(
-                            r'd://Trading/extreme/'+f"{buy_ticker}__{sell_ticker}")
+                            r'd://Trading/belekas/'+f"{buy_ticker}__{sell_ticker}")
                         plt.close()
 
 
-pair(healthy_companies, database_tickers)
+pair(database_tickers, 'BIIB')
