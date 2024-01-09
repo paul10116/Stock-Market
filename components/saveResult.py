@@ -1,12 +1,9 @@
 import pandas as pd
-from plotly import tools
-import plotly.graph_objs as go
 import seaborn as sns
 import matplotlib.pyplot as plt
-from tickers import *
-import sqlite3
 import sqlalchemy
 from indicators import beta
+from tickers import database_tickers
 
 sns.set_style("darkgrid")
 sns.set(font_scale=1.7)

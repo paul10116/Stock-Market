@@ -1,12 +1,10 @@
+import sqlalchemy
 import pandas as pd
 import numpy as np
 from plotly import tools
 import plotly as py
 import plotly.graph_objs as go
-from components.indicators import beta
-from components.tickers import *
-import sqlite3
-import sqlalchemy
+from indicators import beta
 py.offline.init_notebook_mode(connected=True)
 engine = sqlalchemy.create_engine('sqlite:///database.db')
 
@@ -93,7 +91,7 @@ def open_position(buy_ticker, sell_ticker, value, longPrice, shortPrice, entry_d
     Target = Entry+((stop_loss*0.2)*3)
 
     print(
-        f"Entry: {np.round(Entry,2)}  SL: {np.round(stop_loss,2)}  Target: {np.round(Target,2)}  RATIO: {np.round(data.iloc[-1,5],2)}  Value: {np.round(data.iloc[-1,5]/Entry,2)}")
+        f"Entry: {np.round(Entry, 2)}  SL: {np.round(stop_loss, 2)}  Target: {np.round(Target, 2)}  RATIO: {np.round(data.iloc[-1, 5], 2)}  Value: {np.round(data.iloc[-1, 5]/Entry, 2)}")
 
     # CHART
 

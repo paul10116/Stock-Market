@@ -1,10 +1,7 @@
 import pandas as pd
-import numpy as np
 from plotly import tools
 import plotly as py
 import plotly.graph_objs as go
-from components.tickers import *
-import sqlite3
 import sqlalchemy
 py.offline.init_notebook_mode(connected=True)
 engine = sqlalchemy.create_engine('sqlite:///database.db')

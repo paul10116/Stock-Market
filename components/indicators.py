@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import sqlite3
 import sqlalchemy
 
 engine = sqlalchemy.create_engine('sqlite:///database.db')

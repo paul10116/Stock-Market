@@ -1,10 +1,9 @@
 import pandas as pd
 from plotly import tools
 import plotly.graph_objs as go
-from tickers import *
-import sqlite3
 import sqlalchemy
 from indicators import beta
+from tickers import database_tickers
 
 engine = sqlalchemy.create_engine('sqlite:///database.db')
 

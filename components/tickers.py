@@ -10,3 +10,4 @@ database_tickers = 'A  AAP  AAPL  ABB  ABM  ABR  ABT  ACGL  ACIW  ACM  ACRE  ADB
 # additional tickers for database: DELETE
 # add  RHP RIG RJF RMBS
 #  DIV    MPW
+yfinance_delisted = ['MAXR', 'NUVA', 'STAR', 'ABB', 'NEX', 'ESTE', 'SIVB', 'HZNP', 'CTIC', 'FISV', 'SYNH', 'UMPQ', 'HSC', 'CAJ', 'AJRD', 'NCR', 'ISEE', 'ATVI']
