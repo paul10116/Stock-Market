@@ -2,9 +2,9 @@ import pandas as pd
 import numpy as np
 import sqlalchemy
 
-engine = sqlalchemy.create_engine('sqlite:///database.db')
+engine = sqlalchemy.create_engine('sqlite:///stock_etf.db')
 index_data = pd.read_sql_query(
-    "SELECT * FROM indexes", engine, parse_dates="Date")
+    "SELECT * FROM ETF", engine, parse_dates="Date")
 
 
 def beta(data, ticker):

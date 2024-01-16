@@ -1,9 +1,7 @@
-from components.pairFinder import pair
-from components.openPositions import open_position
-from PIL import ImageTk, Image
-from tkinter import *
 from tkinter import messagebox
+from tkinter import *
 from tkinter import filedialog
+from PIL import ImageTk, Image
 
 btn_color = "#2d661b"
 input_clr = "#d3d5d7"

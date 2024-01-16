@@ -3,42 +3,42 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import sqlalchemy
 from indicators import beta
-from tickers import database_tickers
+from tickers import mid_cap_and_above,  xlb, xle, xli, xlu, xlk, xly, xlp, xlv, xlf, xlre, xlc
 
 sns.set_style("darkgrid")
 sns.set(font_scale=1.7)
 
-engine = sqlalchemy.create_engine('sqlite:///database.db')
+engine = sqlalchemy.create_engine('sqlite:///stock_etf.db')
 
 
-def pair(longs, shorts):
+def pair(longs: str, shorts: str) -> None:
+    long_array = longs.split()
+    short_array = shorts.split()
 
-    longArray = longs.split()
-    shortArray = shorts.split()
+    for buy_ticker in long_array:
 
-    for buy_ticker in longArray:
-
-        for sell_ticker in shortArray:
+        for sell_ticker in short_array:
 
             if buy_ticker != sell_ticker:
                 dataframe = pd.read_sql_query(
                     f"SELECT Date, {buy_ticker}, {sell_ticker} FROM stockData", engine, parse_dates="Date")
-
                 long_beta = beta(dataframe[buy_ticker], buy_ticker).round(2)
                 short_beta = beta(dataframe[sell_ticker], sell_ticker).round(2)
                 beta_bearish = long_beta < short_beta
 
                 corr_check = pd.concat(
-                    [dataframe[buy_ticker], dataframe[sell_ticker]], axis=1).corr().iloc[0, 1].round(2)
+                    [dataframe[buy_ticker], dataframe[sell_ticker]], axis=1).corr(method='spearman').iloc[0, 1].round(2)
 
-                if corr_check > 0.4 or corr_check < -0.4:
+                if -0.4 >= corr_check or corr_check >= 0.4:
                     if beta_bearish == True:
 
-                        data = pd.DataFrame({
-                            'Date': dataframe["Date"],
-                            'ratio': (dataframe[buy_ticker]/dataframe[sell_ticker]),
-                            'spread': (dataframe[buy_ticker]-dataframe[sell_ticker]).round(2)
-                        })
+                        data = pd.DataFrame(
+                            {
+                                'Date': dataframe["Date"],
+                                'ratio': (dataframe[buy_ticker] / dataframe[sell_ticker]),
+                                'spread': (dataframe[buy_ticker] - dataframe[sell_ticker]).round(2)
+                            }
+                        )
 
                         ratio_lower = data.iloc[-1, 1] > 0.3
                         ratio_upper = data.iloc[-1, 1] < 3
@@ -92,8 +92,8 @@ def pair(longs, shorts):
                                     plt.tight_layout(pad=1)
 
                                     fig.savefig(
-                                        r'd://Trading/test/'+f"{buy_ticker}__{sell_ticker}")
+                                        r'd://StockMarket/Beta/'+f"{buy_ticker}__{sell_ticker}")
                                     plt.close()
 
 
-pair(database_tickers, database_tickers)
+pair(mid_cap_and_above, mid_cap_and_above)
