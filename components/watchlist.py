@@ -36,6 +36,6 @@ def pair(buy_ticker, sell_ticker):
     sub_fig.append_trace(sub_trace2, 2, 1)
     sub_fig.append_trace(sub_trace3, 1, 2)
     sub_fig.append_trace(sub_trace4, 2, 2)
-    sub_fig.update_layout(height=700, width=1700)
+    sub_fig.update_layout(height=800, width=1400)
 
     sub_fig.show()

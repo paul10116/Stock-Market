@@ -4,9 +4,9 @@ import numpy as np
 from plotly import tools
 import plotly as py
 import plotly.graph_objs as go
-from indicators import beta
+from components.indicators import beta
 py.offline.init_notebook_mode(connected=True)
-engine = sqlalchemy.create_engine('sqlite:///database.db')
+engine = sqlalchemy.create_engine('sqlite:///stock_etf.db')
 
 
 def open_position(buy_ticker, sell_ticker, value, longPrice, shortPrice, entry_date='2022-1-1', long_qty=0, short_qty=0, long_div=0, short_div=0):
@@ -114,8 +114,8 @@ def open_position(buy_ticker, sell_ticker, value, longPrice, shortPrice, entry_d
 
     if data.iloc[-1, 5] < Entry:
         sub_fig.update_layout(
-            height=700, width=1700, paper_bgcolor="tomato")
+            height=800, width=1400, paper_bgcolor="tomato")
         sub_fig.show()
     else:
-        sub_fig.update_layout(height=700, width=1700)
+        sub_fig.update_layout(height=800, width=1400)
         sub_fig.show()
