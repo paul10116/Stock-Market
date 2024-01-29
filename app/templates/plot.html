@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Plot</title>
+</head>
+<body>
+    <h1>{{ buy_ticker }} / {{ sell_ticker }}</h1>
+    <div id="plot"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Bokeh/2.4.2/bokeh-2.4.2.min.js"></script>
+    <script>
+        const data = {{ data.to_json()|safe }};
+        const plot = Bokeh.Plotting.figure({
+            title: '{{ buy_ticker }} // {{ sell_ticker }}',
+            x_axis_label: 'Date',
+            y_axis_label: 'Price'
+        });
+        plot.line(x=data['Date'], y=data['{{ buy_ticker }}'], legend_label='{{ buy_ticker }}');
+        plot.line(x=data['Date'], y=data['{{ sell_ticker }}'], legend_label='{{ sell_ticker }}');
+        Bokeh.Plotting.show(plot);
+    </script>
+</body>
+</html>

@@ -24,13 +24,13 @@ def pair(longs: str, shorts: str) -> None:
                     f"SELECT Date, {buy_ticker}, {sell_ticker} FROM stockData", engine, parse_dates="Date")
                 long_beta = beta(dataframe[buy_ticker], buy_ticker).round(2)
                 short_beta = beta(dataframe[sell_ticker], sell_ticker).round(2)
-                beta_bullish = long_beta > short_beta
+                ratio_beta = long_beta / short_beta
 
                 corr_check = pd.concat(
                     [dataframe[buy_ticker], dataframe[sell_ticker]], axis=1).corr(method='spearman').iloc[0, 1].round(2)
 
                 if -0.4 >= corr_check or corr_check >= 0.4:
-                    if beta_bullish == True:
+                    if ratio_beta > 1:
 
                         data = pd.DataFrame(
                             {
@@ -44,8 +44,6 @@ def pair(longs: str, shorts: str) -> None:
                         ratio_upper = data.iloc[-1, 1] < 3
 
                         if ratio_lower == True and ratio_upper == True:
-                            print(
-                                f"{buy_ticker} / {sell_ticker} CORR = {corr_check}")
 
                             data['spreadMA200'] = data.spread.ewm(
                                 span=200, adjust=False).mean()
@@ -57,10 +55,11 @@ def pair(longs: str, shorts: str) -> None:
                                                        3] > data.iloc[-60, 3]
 
                             if spread_bullish == True and ratio_bullish == True:
+                                print(f"{buy_ticker} / {sell_ticker}")
+                                
                                 data["ratioMin"] = data.ratio.rolling(60).min()
                                 data["ratioMax"] = data.ratio.rolling(60).max()
-                                data["ratioATR"] = data.ratioMax - \
-                                    data.ratioMin
+                                data["ratioATR"] = data.ratioMax - data.ratioMin
                                 data["ratioATR%"] = (
                                     (data.ratioATR+data.ratioATR.shift())/2)/data.ratioMax
 
@@ -72,7 +71,7 @@ def pair(longs: str, shorts: str) -> None:
                                     fig, axes = plt.subplots(
                                         3, figsize=(15, 15), sharex=True)
                                     axes[0].set_title(
-                                        f"{buy_ticker} // {sell_ticker}")
+                                        f"{buy_ticker} // {sell_ticker} Beta {long_beta} / {short_beta}")
                                     sns.lineplot(data=dataframe, x="Date", y=buy_ticker,
                                                  ax=axes[0], label=buy_ticker)
                                     sns.lineplot(data=dataframe, x="Date", y=sell_ticker,
@@ -96,4 +95,4 @@ def pair(longs: str, shorts: str) -> None:
                                     plt.close()
 
 
-pair(mid_cap_and_above, mid_cap_and_above)
+pair(xlc, xlf)
