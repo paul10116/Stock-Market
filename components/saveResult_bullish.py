@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import sqlalchemy
 from indicators import beta
-from tickers import mid_cap_and_above,  xlb, xle, xli, xlu, xlk, xly, xlp, xlv, xlf, xlre, xlc
+from tickers import small_cap_and_above,  xlb, xle, xli, xlu, xlk, xly, xlp, xlv, xlf, xlre, xlc, mega_cap, large_cap, mid_cap, small_cap
 
 sns.set_style("darkgrid")
 sns.set(font_scale=1.7)
@@ -95,4 +95,4 @@ def pair(longs: str, shorts: str) -> None:
                                     plt.close()
 
 
-pair(xlc, xlf)
+pair(mega_cap, mega_cap)

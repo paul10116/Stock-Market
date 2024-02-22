@@ -2,10 +2,10 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import sqlalchemy
-from tickers import mid_cap_and_above, xlb, xle, xli, xlu, xlk, xly, xlp, xlv, xlf, xlre, xlc, sectorsTickers
+from indicators import beta
+from tickers import mega_cap, large_cap, mid_cap, small_cap, small_cap_and_above, xlb, xle, xli, xlu, xlk, xly, xlp, xlv, xlf, xlre, xlc, sectorsTickers
 
 sns.set_style("darkgrid")
-sns.set(font_scale=1.7)
 
 engine = sqlalchemy.create_engine('sqlite:///stock_etf.db')
 
@@ -19,14 +19,19 @@ def pair(longs: str, shorts: str) -> None:
         for sell_ticker in short_array:
 
             if buy_ticker != sell_ticker:
+                print(f"{buy_ticker}, {sell_ticker}")        
                 dataframe = pd.read_sql_query(
                     f"SELECT Date, {buy_ticker}, {sell_ticker} FROM stockData", engine, parse_dates="Date")
+                
+                long_beta = beta(dataframe[buy_ticker], buy_ticker).round(2)
+                short_beta = beta(dataframe[sell_ticker], sell_ticker).round(2)
+                beta_check = long_beta / short_beta
 
                 corr_check = pd.concat(
                     [dataframe[buy_ticker], dataframe[sell_ticker]], axis=1).corr(method='spearman').iloc[0, 1].round(2)
                 if -0.4 >= corr_check or corr_check >= 0.4:
 
-                        data = pd.DataFrame(
+                    data = pd.DataFrame(
                             {
                                 'Date': dataframe["Date"],
                                 'ratio': (dataframe[buy_ticker] / dataframe[sell_ticker]),
@@ -34,60 +39,50 @@ def pair(longs: str, shorts: str) -> None:
                             }
                         )
 
-                        ratio_lower = data.iloc[-1, 1] > 0.3
-                        ratio_upper = data.iloc[-1, 1] < 3
+                    ratio_lower = data.iloc[-1, 1] > 0.3
+                    ratio_upper = data.iloc[-1, 1] < 3
 
-                        if ratio_lower == True and ratio_upper == True:
-                            print(
-                                f"{buy_ticker} / {sell_ticker} CORR = {corr_check}")
+                    if ratio_lower == True and ratio_upper == True and beta_check > 1:
+                        data["C_C_returns"] = ((data.ratio - data.ratio.shift(1)) / data.ratio.shift(1))*100
+                        data['EMA_100'] = data['ratio'].ewm(span=100, adjust=False).mean()
+                        
+                        skew = data["C_C_returns"].skew().round(2)
+                        kurtosis = data["C_C_returns"].kurtosis().round(2)
+                        mean = data["C_C_returns"].mean().round(2)
+                        std = data["C_C_returns"].std().round(2)
+                        bullish_mean = mean > 0.05
+                        kurtosis_check = kurtosis < 20
+                        skew_check = skew > 0.5
+                        ratio_check = data.iloc[-1, 1] > data.iloc[-1,4]
+                                
+                        if bullish_mean == True and kurtosis_check == True and skew_check == True and ratio_check == True:
+                            print(data.tail(1))
 
-                            data['spreadMA200'] = data.spread.ewm(
-                                span=200, adjust=False).mean()
-                            data["ratioEMA"] = data.ratio.ewm(
-                                span=200, adjust=False).mean()
-                            ratio_bullish = data.iloc[-1,
-                                                      4] > data.iloc[-60, 4]
-                            spread_bullish = data.iloc[-1,
-                                                       3] > data.iloc[-60, 3]
-
-                            if spread_bullish == True and ratio_bullish == True:
-                                data["ratioMin"] = data.ratio.rolling(60).min()
-                                data["ratioMax"] = data.ratio.rolling(60).max()
-                                data["ratioATR"] = data.ratioMax - \
-                                    data.ratioMin
-                                data["ratioATR%"] = (
-                                    (data.ratioATR+data.ratioATR.shift())/2)/data.ratioMax
-
-                                ratio_ATR = data.iloc[-1, 8] > 0.3
-
-                                if ratio_ATR == True:
-                                    print(data.tail(1))
-
-                                    fig, axes = plt.subplots(
-                                        3, figsize=(15, 15), sharex=True)
-                                    axes[0].set_title(
+                            fig, axes = plt.subplots(
+                                        4, figsize=(15, 15), sharex=False)
+                            axes[0].set_title(
                                         f"{buy_ticker} // {sell_ticker}")
-                                    sns.lineplot(data=dataframe, x="Date", y=buy_ticker,
+                            sns.lineplot(data=dataframe, x="Date", y=buy_ticker,
                                                  ax=axes[0], label=buy_ticker)
-                                    sns.lineplot(data=dataframe, x="Date", y=sell_ticker,
+                            sns.lineplot(data=dataframe, x="Date", y=sell_ticker,
                                                  ax=axes[0], label=sell_ticker)
-                                    axes[1].set_title(
-                                        f"Ratio")
-                                    sns.lineplot(
+                            axes[1].set_title(f"skew = {skew} // kurtosis = {kurtosis}__Ratio")
+                            sns.lineplot(data=data, x="Date", y="EMA_100", ax=axes[1])
+                            sns.lineplot(
                                         data=data, x="Date", y="ratio", ax=axes[1])
-                                    sns.lineplot(
-                                        data=data, x="Date", y="ratioEMA", ax=axes[1])
-                                    axes[2].set_title(
-                                        f"Spread")
-                                    sns.lineplot(
+                            axes[2].set_title("Spread")
+                            sns.lineplot(
                                         data=data, x="Date", y="spread", ax=axes[2])
-                                    sns.lineplot(
-                                        data=data, x="Date", y="spreadMA200", ax=axes[2])
-                                    plt.tight_layout(pad=1)
+                            axes[3].set_title(f'Mean = {mean} and STD = {std}')
+                            axes[3].axvline(x=mean, color='red')
+                            axes[3].axvline(x=0, color='green', linestyle='dashed')
+                            sns.histplot(
+                                        data=data, x="C_C_returns", ax=axes[3], binwidth=0.5, kde=True)
+                            plt.tight_layout(pad=1)
 
-                                    fig.savefig(
-                                        r'd://StockMarket/xlk_xlu/'+f"{buy_ticker}__{sell_ticker}")
-                                    plt.close()
+                            fig.savefig(
+                                        r'd://StockMarket/DOF/all_positive/'+f"{buy_ticker}__{sell_ticker}")
+                            plt.close()
 
 
-pair(xlk, xlu)
+pair(mid_cap, large_cap)

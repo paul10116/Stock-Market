@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import sqlalchemy
 from indicators import beta
-from tickers import mid_cap_and_above,  xlb, xle, xli, xlu, xlk, xly, xlp, xlv, xlf, xlre, xlc, sectorsTickers
+from tickers import xlb, xle, xli, xlu, xlk, xly, xlp, xlv, xlf, xlre, xlc, mega_cap, large_cap, mid_cap, small_cap, small_cap_and_above
 
 sns.set_style("darkgrid")
 sns.set(font_scale=1.7)
@@ -14,6 +14,7 @@ engine = sqlalchemy.create_engine('sqlite:///stock_etf.db')
 def pair(longs: str, shorts: str) -> None:
     long_array = longs.split()
     short_array = shorts.split()
+    
 
     for buy_ticker in long_array:
 
@@ -28,7 +29,7 @@ def pair(longs: str, shorts: str) -> None:
 
                 corr_check = pd.concat(
                     [dataframe[buy_ticker], dataframe[sell_ticker]], axis=1).corr(method='spearman').iloc[0, 1].round(2)
-
+                print(f"{buy_ticker} / {sell_ticker} CORR = {corr_check}")
                 if -0.4 >= corr_check or corr_check >= 0.4:
                     if ratio_beta > 1:
 
@@ -80,8 +81,8 @@ def pair(longs: str, shorts: str) -> None:
                                         data=data, x="Date", y="spreadMA200", ax=axes[2])
                                 plt.tight_layout(pad=1)
 
-                                fig.savefig(r'd://StockMarket/xlre/'+f"{buy_ticker}__{sell_ticker}")
+                                fig.savefig(r'd://StockMarket/small_cap/'+f"{buy_ticker}__{sell_ticker}")
                                 plt.close()
 
 
-pair(xlre, xlre)
+pair('GOOGL', small_cap_and_above)
