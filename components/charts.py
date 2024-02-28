@@ -2,11 +2,10 @@ import sqlalchemy
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import numpy as np
 from plotly import tools
 import plotly as py
 import plotly.graph_objs as go
-from components.indicators import beta
+from indicators import beta
 py.offline.init_notebook_mode(connected=True)
 engine = sqlalchemy.create_engine('sqlite:///stock_etf.db')
 
@@ -18,40 +17,29 @@ def open_position(buy_ticker, sell_ticker, value, longPrice, shortPrice, entry_d
 
     data = pd.DataFrame({
         'Date': dataframe["Date"],
-        'long_max': dataframe[buy_ticker].rolling(30).max(),
-        'long_min': dataframe[buy_ticker].rolling(30).min(),
-        'short_max': dataframe[sell_ticker].rolling(30).max(),
-        'short_min': dataframe[sell_ticker].rolling(30).min(),
         'ratio': (dataframe[buy_ticker]/dataframe[sell_ticker]),
         'spread': (dataframe[buy_ticker]-dataframe[sell_ticker]).round(2)
     })
-
-    position_ATR = pd.DataFrame({
-        'long_ATR': data.long_max - data.long_min,
-        'short_ATR': data.short_max - data.short_min
-    })
+    
     position_vol = pd.DataFrame({
-        'long_ATR%': ((position_ATR.long_ATR + position_ATR.long_ATR.shift())/2)/data.long_max,
-        'short_ATR%': ((position_ATR.short_ATR + position_ATR.short_ATR.shift())/2)/data.short_max,
+        'long_STD': dataframe[buy_ticker].std(),
+        'short_STD': dataframe[sell_ticker].std(),
         'long_beta': beta(dataframe[buy_ticker], buy_ticker).round(2),
         'short_beta': beta(dataframe[sell_ticker], sell_ticker).round(2)
-    })
+    }, index=[0])
+    
 
     position_weights = pd.DataFrame({
         'long_beta_weight': position_vol["long_beta"]/(position_vol["long_beta"] + position_vol["short_beta"]),
-        'long_ATR_weight': position_vol["long_ATR%"] / (position_vol["long_ATR%"] + position_vol["short_ATR%"]),
+        'long_STD_weight': position_vol["long_STD"] / (position_vol["long_STD"] + position_vol["short_STD"]),
         'short_beta_weight': position_vol["short_beta"]/(position_vol["long_beta"] + position_vol["short_beta"]),
-        'short_ATR_weight': position_vol["short_ATR%"] / (position_vol["long_ATR%"] + position_vol["short_ATR%"]),
+        'short_STD_weight': position_vol["short_STD"] / (position_vol["long_STD"] + position_vol["short_STD"]),
     })
 
     # # Position size
 
-    long_pos_size = value * \
-        ((position_weights.iloc[-1, 2] +
-         position_weights.iloc[-1, 3])/2)
-    short_pos_size = value * \
-        ((position_weights.iloc[-1, 0] +
-         position_weights.iloc[-1, 1])/2)
+    long_pos_size = value * ((position_weights.iloc[-1, 2] + position_weights.iloc[-1, 3])/2)
+    short_pos_size = value * ((position_weights.iloc[-1, 0] + position_weights.iloc[-1, 1])/2)
 
     money_division = pd.DataFrame({
         buy_ticker: {
@@ -76,44 +64,43 @@ def open_position(buy_ticker, sell_ticker, value, longPrice, shortPrice, entry_d
         }
     }).T
 
-    print(money_division)
+    print(position_vol)
 
-    # # Technical Chart:
-    Entry = longPrice / shortPrice
-    stop_loss = Entry - \
-        (Entry * ((money_division.iloc[0, 2] + money_division.iloc[1, 2])/2))
-    Target = Entry+((stop_loss*0.2)*3)
+    # # # Technical Chart:
+    # Entry = longPrice / shortPrice
+    # stop_loss = Entry - \
+    #     (Entry * ((money_division.iloc[0, 2] + money_division.iloc[1, 2])/2))
+    # Target = Entry+((stop_loss*0.2)*3)
 
-    print(
-        f"Entry: {np.round(Entry, 2)}  SL: {np.round(stop_loss, 2)}  Target: {np.round(Target, 2)}  RATIO: {np.round(data.iloc[-1, 5], 2)}  Value: {np.round(data.iloc[-1, 5]/Entry, 2)}")
+    # print(
+    #     f"Entry: {np.round(Entry, 2)}  SL: {np.round(stop_loss, 2)}  Target: {np.round(Target, 2)}  RATIO: {np.round(data.iloc[-1, 5], 2)}  Value: {np.round(data.iloc[-1, 5]/Entry, 2)}")
 
-    # CHART
+    # # CHART
 
-    sub_fig = tools.make_subplots(rows=2, cols=2, subplot_titles=[
-        buy_ticker, "Ratio", sell_ticker, 'Spread'], shared_xaxes=True)
+    # sub_fig = tools.make_subplots(rows=2, cols=2, subplot_titles=[
+    #     buy_ticker, "Ratio", sell_ticker, 'Spread'], shared_xaxes=True)
 
-    sub_trace1 = go.Scatter(x=dataframe['Date'],
-                            y=dataframe[buy_ticker], mode='lines', name=buy_ticker)
-    sub_trace2 = go.Scatter(x=dataframe['Date'],
-                            y=dataframe[sell_ticker], mode='lines', name=sell_ticker)
-    sub_trace3 = go.Scatter(
-        x=dataframe['Date'], y=data['ratio'], mode='lines', name='Ratio')
-    sub_trace4 = go.Scatter(
-        x=dataframe['Date'], y=data['spread'], mode='lines', name='Spread')
+    # sub_trace1 = go.Scatter(x=dataframe['Date'],
+    #                         y=dataframe[buy_ticker], mode='lines', name=buy_ticker)
+    # sub_trace2 = go.Scatter(x=dataframe['Date'],
+    #                         y=dataframe[sell_ticker], mode='lines', name=sell_ticker)
+    # sub_trace3 = go.Scatter(
+    #     x=dataframe['Date'], y=data['ratio'], mode='lines', name='Ratio')
+    # sub_trace4 = go.Scatter(
+    #     x=dataframe['Date'], y=data['spread'], mode='lines', name='Spread')
 
-    sub_fig.append_trace(sub_trace1, 1, 1)
-    sub_fig.append_trace(sub_trace2, 2, 1)
-    sub_fig.append_trace(sub_trace3, 1, 2)
-    sub_fig.append_trace(sub_trace4, 2, 2)
+    # sub_fig.append_trace(sub_trace1, 1, 1)
+    # sub_fig.append_trace(sub_trace2, 2, 1)
+    # sub_fig.append_trace(sub_trace3, 1, 2)
+    # sub_fig.append_trace(sub_trace4, 2, 2)
 
-    if data.iloc[-1, 5] < stop_loss:
-        sub_fig.update_layout(
-            height=800, width=1400, paper_bgcolor="tomato")
-        sub_fig.show()
-    else:
-        sub_fig.update_layout(height=800, width=1400)
-        sub_fig.show()
-
+    # if data.iloc[-1, 5] < stop_loss:
+    #     sub_fig.update_layout(
+    #         height=800, width=1400, paper_bgcolor="tomato")
+    #     sub_fig.show()
+    # else:
+    #     sub_fig.update_layout(height=800, width=1400)
+    #     sub_fig.show()
 
 
 

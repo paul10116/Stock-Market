@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import sqlalchemy
 from indicators import beta
-from tickers import mega_cap, large_cap, mid_cap, small_cap, small_cap_and_above, xlb, xle, xli, xlu, xlk, xly, xlp, xlv, xlf, xlre, xlc, sectorsTickers
+from tickers import with_div, no_div
 
 sns.set_style("darkgrid")
 
@@ -42,9 +42,9 @@ def pair(longs: str, shorts: str) -> None:
                     ratio_lower = data.iloc[-1, 1] > 0.3
                     ratio_upper = data.iloc[-1, 1] < 3
 
-                    if ratio_lower == True and ratio_upper == True and beta_check > 1:
+                    if ratio_lower == True and ratio_upper == True:
                         data["C_C_returns"] = ((data.ratio - data.ratio.shift(1)) / data.ratio.shift(1))*100
-                        data['EMA_100'] = data['ratio'].ewm(span=100, adjust=False).mean()
+                        data['EMA_50'] = data['ratio'].ewm(span=50, adjust=False).mean()
                         
                         skew = data["C_C_returns"].skew().round(2)
                         kurtosis = data["C_C_returns"].kurtosis().round(2)
@@ -55,7 +55,7 @@ def pair(longs: str, shorts: str) -> None:
                         skew_check = skew > 0.5
                         ratio_check = data.iloc[-1, 1] > data.iloc[-1,4]
                                 
-                        if bullish_mean == True and kurtosis_check == True and skew_check == True and ratio_check == True:
+                        if ratio_check == True:
                             print(data.tail(1))
 
                             fig, axes = plt.subplots(
@@ -67,13 +67,14 @@ def pair(longs: str, shorts: str) -> None:
                             sns.lineplot(data=dataframe, x="Date", y=sell_ticker,
                                                  ax=axes[0], label=sell_ticker)
                             axes[1].set_title(f"skew = {skew} // kurtosis = {kurtosis}__Ratio")
-                            sns.lineplot(data=data, x="Date", y="EMA_100", ax=axes[1])
+                            sns.lineplot(data=data, x="Date", y="EMA_50", ax=axes[1])
                             sns.lineplot(
                                         data=data, x="Date", y="ratio", ax=axes[1])
                             axes[2].set_title("Spread")
                             sns.lineplot(
                                         data=data, x="Date", y="spread", ax=axes[2])
                             axes[3].set_title(f'Mean = {mean} and STD = {std}')
+                            
                             axes[3].axvline(x=mean, color='red')
                             axes[3].axvline(x=0, color='green', linestyle='dashed')
                             sns.histplot(
@@ -81,8 +82,8 @@ def pair(longs: str, shorts: str) -> None:
                             plt.tight_layout(pad=1)
 
                             fig.savefig(
-                                        r'd://StockMarket/DOF/all_positive/'+f"{buy_ticker}__{sell_ticker}")
+                                        r'd://StockMarket/div_pos/'+f"{buy_ticker}__{sell_ticker}")
                             plt.close()
 
 
-pair(mid_cap, large_cap)
+pair(with_div, no_div)
