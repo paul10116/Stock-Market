@@ -1,7 +1,7 @@
 import sqlalchemy
 import pandas as pd
 from indicators import beta, EMA
-from tickers import with_div, no_div
+from tickers import with_div, no_div, new_small_cap_and_above
 
 engine = sqlalchemy.create_engine('sqlite:///stock_etf.db')
 

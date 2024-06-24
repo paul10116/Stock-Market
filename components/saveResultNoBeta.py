@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import sqlalchemy
 from indicators import beta
-from tickers import with_div, no_div
+from tickers import with_div, no_div, new_small_cap_and_above
 
 sns.set_style("darkgrid")
 
@@ -64,8 +64,8 @@ def pair(longs: str, shorts: str) -> None:
                         plt.tight_layout(pad=1)
 
                         fig.savefig(
-                                        r'd://StockMarket/ALSN/'+f"{buy_ticker}__{sell_ticker}")
+                                        r'd://StockMarket/COIN/'+f"{buy_ticker}__{sell_ticker}")
                         plt.close()
 
 
-pair('ALSN', no_div)
+pair('AMD', new_small_cap_and_above)
