@@ -7,7 +7,7 @@ engine = sqlalchemy.create_engine('sqlite:///stock_etf.db')
 data = pd.read_sql_query("SELECT * FROM stockData", engine, parse_dates="Date")
 
 
-results = pd.read_sql_query("""SELECT * FROM Dividend_watchlist WHERE Correlation <= -0.9 AND Correlation >= -1  """, engine)
+results = pd.read_sql_query("""SELECT * FROM stockData  """, engine)
 print(results.tail(5))
 
 def pair_plot(results :pd.DataFrame):

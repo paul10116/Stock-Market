@@ -1,7 +1,7 @@
 import sqlalchemy
 import pandas as pd
 from indicators import beta, EMA
-from tickers import with_div, no_div, new_small_cap_and_above
+from tickers import over_2_B, sectorsTickers
 
 engine = sqlalchemy.create_engine('sqlite:///stock_etf.db')
 
@@ -71,4 +71,4 @@ def pair(longs: str, shorts: str) -> None:
                             pair_statistics.to_sql('Without_div_watchlist', engine, if_exists='append', index=False)
 
 
-pair(no_div, no_div)
+pair(over_2_B, over_2_B)

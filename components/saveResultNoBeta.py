@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import sqlalchemy
 from indicators import beta
-from tickers import with_div, no_div, new_small_cap_and_above
+from tickers import over_2_B, sectorsTickers
 
 sns.set_style("darkgrid")
 
